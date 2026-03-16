@@ -1,28 +1,34 @@
-const express = require("express");
-const app = express();
-const snapsave = require("./snapsave-downloader/src/index");
-const port = 3000;
+const http = require("node:http");
+const { empty, notFound, sendNodeResponse } = require("./lib/http");
+const { handleHome, handleIgdl } = require("./lib/handlers");
 
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
-});
+const port = Number(process.env.PORT) || 3000;
 
-app.get("/igdl", async (req, res) => {
-  try {
-    const url = req.query.url;
+const server = http.createServer(async (req, res) => {
+  const request = {
+    method: req.method || "GET",
+    url: new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).toString(),
+  };
 
-    if (!url) {
-      return res.status(400).json({ error: "URL parameter is missing" });
+  let response;
+
+  if (request.url.endsWith("/favicon.ico")) {
+    response = empty();
+  } else {
+    const pathname = new URL(request.url).pathname;
+
+    if (pathname === "/") {
+      response = await handleHome(request);
+    } else if (pathname === "/igdl") {
+      response = await handleIgdl(request);
+    } else {
+      response = notFound();
     }
-
-    const downloadedURL = await snapsave(url);
-    res.json({ url: downloadedURL });
-  } catch (err) {
-    console.error("Error:", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
   }
+
+  sendNodeResponse(res, response);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

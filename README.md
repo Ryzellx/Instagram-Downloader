@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository houses an API for effortlessly downloading Instagram videos using JavaScript. Created with Node.js and powered by instaloader, this API allows seamless integration of Instagram video downloading capabilities into your applications or projects.
+This repository houses an API for effortlessly downloading Instagram videos using JavaScript. It is structured for Vercel Node.js Functions, while still providing a small local Node server for development.
 
 ## Features
 
@@ -23,14 +23,20 @@ This repository houses an API for effortlessly downloading Instagram videos usin
    npm install
    ```
 
-3. **Run the Node.js application:**
+3. **Run the local Node.js server:**
    ```bash
-   node index.js
+   npm start
    ```
 
 ## Endpoints
 
 - `/igdl?url=`
+
+## Vercel Deployment
+
+- `/` rewrites to `/api/index`
+- `/igdl` rewrites to `/api/igdl`
+- Vercel will detect this project as Node.js Functions instead of Express because it no longer depends on `express` or starts an Express app
 
 # Usage
 
